@@ -1,4 +1,7 @@
 import requests
+import csv
+import pandas as pd
+import matplotlib.pyplot as plt
 from Planeta import Planeta
 from moduloPelicula import moduloPelicula
 from moduloPersonaje import moduloPersonaje
@@ -64,14 +67,43 @@ class moduloPlaneta:
                                                         lista_personajes,
                                                         lista_episodios
                                                         ))
+            
+    def mostrar_grafico(self):
+        #Se crea la lista donde se almacenan los datos a representar de cada planeta
+        data = []
+        for planeta in self.lista_planetas:
+            datos_planeta = {"NOMBRE PLANETA": planeta.nombre, "CANTIDAD DE PERSONAJES ORIGINARIOS": len(planeta.personajes)}
+            data.append(datos_planeta)
 
-'''
-peliculas = moduloPelicula(response_peliculas)
-vehiculos = moduloVehiculo(response_vehiculos)
-naves = moduloNave(response_naves)
-especies = moduloEspecie(response_especies, peliculas)
-personajes = moduloPersonaje(response_personajes, peliculas, especies, naves, vehiculos)
-modulo_planetas = moduloPlaneta(response_planetas, peliculas, personajes)
-for planeta in modulo_planetas.lista_planetas:
-    planeta.mostrar_planeta()
-'''
+        #Se crea el archivo .csv llamado datos_planetas.csv, y se utiliza el parametro "w" para indicar que vamos a escribir datos sobre el archivo
+        with open('datos_planetas.csv', 'w', newline='') as csvfile:
+            #Se definen los titulos de las columnas
+            campos = ["NOMBRE PLANETA", "CANTIDAD DE PERSONAJES ORIGINARIOS"]
+            #Se utiliza la clase DictWriter para escribir los campos definidos como los nombres de las columnas, y la data de los diccionarios como las filas del csv
+            writer = csv.DictWriter(csvfile, fieldnames=campos)
+            #Se escribe la cabecera del archivo
+            writer.writeheader()
+            #Se llenan las filas con la informacion de los planetas
+            writer.writerows(data)
+
+        datos = pd.read_csv('datos_planetas.csv') 
+  
+        df = pd.DataFrame(datos) 
+        
+        #Se asignan que datos se representaran en el eje X y en el eje Y
+        X = list(df.iloc[:, 0]) 
+        Y = list(df.iloc[:, 1]) 
+        
+        #Se crea el grafico de barras 
+        plt.bar(X, Y, color='m') 
+        plt.title("INFORMACION DE PLANETAS") 
+        plt.xlabel("NOMBRE PLANETA") 
+        plt.ylabel("PERSONAJES ORIGINARIOS") 
+
+        #Se ajusta el tamaño de la fuente:
+        font = {'size': 6}
+        plt.rc('font', **font)
+        
+        #Se visualiza el gráfico
+        plt.show()
+
